@@ -1,20 +1,39 @@
-import { Application as App } from "https://esm.sh/pixi.js@6.0.0";
+import { Application as App } from "pixi.js";
+import { Viewport } from "pixi-viewport";
 import keyboard from "./keyboard.js";
-import SelectedCell from "./selected-cell.js";
 import Grid from "./grid.js";
 import Background from "./background.js";
 import Token from "./token.js";
+import TokenCollection from "./token-collection.js";
 
 export default class Application {
     constructor({ config, state, assets }) {
         this.app = new App({
-              width: 100,         // default: 800
-              height: 100,        // default: 600
+            // width: 100,         // default: 800
+            // height: 100,        // default: 600
             antialias: true,
             resolution: config.resolution,
             resizeTo: window,
             // powerPreference: 'high-performance',
         });
+        this.viewport = new Viewport({
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            worldWidth: 1000,
+            worldHeight: 1000,
+        
+            interaction: this.app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+        })
+        this.app.stage.addChild(this.viewport)
+
+        this.app.renderer.backgroundColor = config.backgroundColor;
+
+        this.viewport
+            .drag()
+            .pinch()
+            .wheel()
+            .decelerate();
+
         this.config = config;
         this.state = state;
         this.assets = assets;
@@ -23,46 +42,35 @@ export default class Application {
     async run() {
         const { app, config, assets, state } = this;
 
-        // app.renderer.view.style.position = "absolute";
-        // app.renderer.view.style.display = "block";
-        // app.renderer.autoResize = true;
-        // app.renderer.resize(window.innerWidth, window.innerHeight);
-        
         document.body.appendChild(app.view);
 
-        assets.add('background', config.background);
-        assets.add(["public/media/nothic.png"]);
+        assets.add('backgroundImage', config.backgroundImage);
+        assets.add(["public/nothic.png"]);
         await assets.load();
         
         const background = new Background(assets);
-        app.stage.addChild(background.layer);
+        this.viewport.addChild(background.layer);
 
         const grid = new Grid(config, { thickness: 1, alpha: 0.5 });
-        app.stage.addChild(grid.lines);
+        this.viewport.addChild(grid.lines);
 
-        state.selectedCell = new SelectedCell(3, 4, 50, 1, 1);
-        app.stage.addChild(state.selectedCell.rectangle);
-
+        const tokens = new TokenCollection(state);
+        
         const nothic = new Token(
-            state,
             config,
             assets,
-            1,
-            1,
-            "public/media/nothic.png"
+            { x: 1, y: 1, image: "public/nothic.png" },
         );
-        nothic.vx = 0;
-        nothic.vy = 0;
-        app.stage.addChild(nothic.layer);
+        tokens.add(nothic);
 
-        // app.stage.addChild(token(9, 9, "public/media/nothic.png"));
-        // app.stage.addChild(token(5, 5, "public/media/nothic.png"));
-        // app.stage.addChild(token(3, 4, "public/media/nothic.png"));
-        // app.stage.addChild(token(2, 6, "public/media/nothic.png"));
-        // app.stage.addChild(token(13, 16, "public/media/nothic.png"));
-        // app.stage.addChild(token(17, 2, "public/media/nothic.png"));
-        // app.stage.addChild(token(18, 19, "public/media/nothic.png"));
-        // app.stage.addChild(token(3, 11, "public/media/nothic.png"));
+        const nothic2 = new Token(
+            config,
+            assets,
+            { x: 9, y: 9, image: "public/nothic.png" },
+        );
+        tokens.add(nothic2);
+
+        this.viewport.addChild(tokens.layer);
 
         const left = keyboard("ArrowLeft");
         const up = keyboard("ArrowUp");
@@ -73,25 +81,25 @@ export default class Application {
         left.press = () => {
             if (!state.selectedToken) return;
             //Change the cat's velocity when the key is pressed
-            state.selectedToken.x -= config.cellsize;
+            state.selectedToken.layer.x -= config.cellsize;
         };
 
         //Up
         up.press = () => {
             if (!state.selectedToken) return;
-            state.selectedToken.y -= config.cellsize;
+            state.selectedToken.layer.y -= config.cellsize;
         };
 
         //Right
         right.press = () => {
             if (!state.selectedToken) return;
-            state.selectedToken.x += config.cellsize;
+            state.selectedToken.layer.x += config.cellsize;
         };
 
         //Down
         down.press = () => {
             if (!state.selectedToken) return;
-            state.selectedToken.y += config.cellsize;
+            state.selectedToken.layer.y += config.cellsize;
         };
 
         app.ticker.add(() => {

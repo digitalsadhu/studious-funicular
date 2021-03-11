@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = fastify({ logger: true });
 
 app.register(fastifyStatic, {
-    root: path.join(__dirname, 'src'),
+    root: path.join(__dirname, 'dist'),
     prefix: '/public/',
 });
 

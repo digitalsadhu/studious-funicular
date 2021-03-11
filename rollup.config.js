@@ -3,9 +3,9 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: './src/index.js',
+  input: './src/scripts.js',
   plugins: [
-      nodeResolve(),
+      nodeResolve({ browser: true, preferBuiltins: false }),
       commonjs({
         include: /node_modules/,
       }),
@@ -20,7 +20,7 @@ export default {
       { 
           sourcemap: true,
           format: 'esm',
-          file: 'public/scripts.js',
+          file: 'dist/scripts.js',
       },
   ],
 };

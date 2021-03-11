@@ -1,10 +1,12 @@
 export default class Config {
-    constructor({ width, height, cellsize, background, resolution }) {
+    constructor({ name, width, height, cellsize, backgroundImage, resolution, backgroundColor }) {
+        this.name = name;
         this.width = width;
         this.height = height;
         this.cellsize = cellsize;
-        this.background = background;
+        this.backgroundImage = backgroundImage;
         this.resolution = resolution;
+        this.backgroundColor = backgroundColor;
     }
 
     get widthPx() {

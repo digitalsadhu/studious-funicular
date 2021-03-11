@@ -1,4 +1,4 @@
-import { Loader } from "https://esm.sh/pixi.js@6.0.0";
+import { Loader } from "pixi.js";
 
 export default class GameAssets {
     constructor() {

@@ -1,4 +1,4 @@
-import { Container } from "https://esm.sh/pixi.js@6.0.0";
+import { Container } from "pixi.js";
 import { line } from './shapes.js';
 
 export default class Grid {

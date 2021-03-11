@@ -1,4 +1,4 @@
-import { Graphics } from "https://esm.sh/pixi.js@6.0.0";
+import { Graphics } from "pixi.js";
 
 export const line = (from, to, thickness = 1, alpha = 1) => {
     let line = new Graphics();

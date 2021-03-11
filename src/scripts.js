@@ -4,12 +4,13 @@ import Config from "./config.js";
 import GameAssets from "./game-assets.js";
 
 const config = new Config({
+  name: 'Test Map',
   width: 30,
   height: 30,
   cellsize: 50,
-  background: "public/media/bg.jpg",
+  backgroundImage: "public/bg.jpg",
   resolution: 1,
-  backgroundColor: '',
+  backgroundColor: 0x8f8f8f,
 });
 const state = new GameState();
 const assets = new GameAssets();

@@ -1,9 +1,9 @@
-import { Sprite } from "https://esm.sh/pixi.js@6.0.0";
+import { Sprite } from "pixi.js";
 
 export default class Background {
     constructor(assets) {
         console.log(assets.resources)
-        this.layer = new Sprite(assets.resources.background.texture);
+        this.layer = new Sprite(assets.resources.backgroundImage.texture);
         this.layer.x = 0;
         this.layer.y = 0;
     }

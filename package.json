@@ -5,15 +5,16 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "watch": "rollup -cw"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "fastify": "^3.13.0",
-    "fastify-static": "^4.0.1",
-    "pixi.js": "^6.0.0"
+    "fastify-static": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",
@@ -22,6 +23,8 @@
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "microbundle": "^0.13.0",
+    "pixi-viewport": "^4.21.1",
+    "pixi.js": "^6.0.0",
     "rollup": "^2.40.0"
   }
 }
