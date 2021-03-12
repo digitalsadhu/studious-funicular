@@ -36,7 +36,10 @@ export default class Application {
   }
 
   createTokenAtCoords(token) {
-    const { x, y } = this.viewport.toWorld(token.x, token.y);
+    const { x, y } = this.viewport.toWorld(
+      token.x / this.config.resolution,
+      token.y / this.config.resolution
+    );
     const cellX = Math.ceil(x / this.config.cellsize);
     const cellY = Math.ceil(y / this.config.cellsize);
     const t = new Token(this.config, this.assets, {
