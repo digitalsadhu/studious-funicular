@@ -15,7 +15,7 @@ export default class Token {
     this.colorFilter = new filters.ColorMatrixFilter();
     layer.filters = [this.colorFilter];
     this.colorFilter.enabled = false;
-    this.colorFilter.hue(180);
+    this.colorFilter.hue(45);
 
     const sprite = new Sprite(resources[image].texture);
     sprite.width = config.cellsize;

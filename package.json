@@ -22,9 +22,11 @@
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
+    "htm": "^3.0.4",
     "microbundle": "^0.13.0",
     "pixi-viewport": "^4.21.1",
     "pixi.js": "^6.0.0",
+    "preact": "^10.5.12",
     "rollup": "^2.40.0"
   }
 }

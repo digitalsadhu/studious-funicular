@@ -6,7 +6,7 @@ import Background from "./background.js";
 import Token from "./token.js";
 import TokenCollection from "./token-collection.js";
 
-export default class Application {
+export default class TableTop {
   constructor({ config, state, assets }) {
     this.app = new App({
       // width: 100,         // default: 800

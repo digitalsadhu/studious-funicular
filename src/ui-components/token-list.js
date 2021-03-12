@@ -1,21 +1,14 @@
-import UIComponent from "./ui-component.js";
+import { h } from "preact";
+import htm from "htm";
 import Token from "./token.js";
 
-export default class TokenList extends UIComponent {
-  constructor(props) {
-    super();
-    this.props = props;
-    this.state = {
-      tokens: this.props.tokens.map(
-        (token) => new Token({ src: token, copy: this.props.copy })
-      ),
-    };
-  }
-  render() {
-    const el = this.template(`<ul></ul>`);
-    for (const token of this.state.tokens) {
-      el.appendChild(token.render());
-    }
-    return el;
-  }
-}
+const html = htm.bind(h);
+
+const TokenList = (props) => {
+  const { tokens, copy } = props;
+  return html`<ul>
+    ${tokens.map((token) => html`<${Token} src="${token}" copy="${copy}"><//>`)}
+  </ul>`;
+};
+
+export default TokenList;
