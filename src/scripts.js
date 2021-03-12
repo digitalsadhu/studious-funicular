@@ -1,8 +1,8 @@
 import GameState from "./game-state.js";
-import TableTop from "./application.js";
+import TableTop from "./table-top.js";
 import Config from "./config.js";
 import GameAssets from "./game-assets.js";
-import SideBar from "./ui-components/side-bar.js";
+import App from "./ui-components/app.js";
 import { h, render } from "preact";
 import htm from "htm";
 
@@ -26,7 +26,7 @@ const assets = new GameAssets();
 const app = new TableTop({ config, state, assets });
 
 render(
-  html`<${SideBar}
+  html`<${App}
     tokens="${tokens}"
     copy="${app.createTokenAtCoords.bind(app)}"
   />`,

@@ -53,7 +53,7 @@ export default class TableTop {
   async run() {
     const { app, config, assets, state } = this;
 
-    document.body.appendChild(app.view);
+    document.getElementById("canvas").appendChild(app.view);
 
     assets.add("backgroundImage", config.backgroundImage);
     assets.add(["public/nothic.png"]);
