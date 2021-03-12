@@ -9,6 +9,10 @@ export default class GameAssets {
     this.loader.add(...args);
   }
 
+  has(name) {
+    return !!this.loader.resources[name];
+  }
+
   load() {
     return new Promise((resolve) => {
       this.loader.load((_, resources) => {

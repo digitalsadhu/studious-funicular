@@ -8,6 +8,8 @@ import TokenCollection from "./token-collection.js";
 import GameAssets from "./game-assets.js";
 import GameState from "./game-state.js";
 
+const render = Symbol("render");
+
 export default class TableTop {
   constructor({ config, assets }) {
     this.app = new App({
@@ -31,10 +33,13 @@ export default class TableTop {
     this.viewport.drag().pinch().wheel().decelerate();
 
     this.config = config;
-    this.state = new GameState();
-    this.assetLoader = new GameAssets();
 
+    this.state = new GameState();
+
+    this.assetLoader = new GameAssets();
     this.assetLoader.add(assets.tokens);
+
+    this.background = new Background(this.assetLoader);
 
     const left = keyboard("ArrowLeft");
     const up = keyboard("ArrowUp");
@@ -43,27 +48,27 @@ export default class TableTop {
 
     //Left arrow key `press` method
     left.press = () => {
-      if (!state.selectedToken) return;
+      if (!this.state.selectedToken) return;
       //Change the cat's velocity when the key is pressed
-      state.selectedToken.layer.x -= config.cellsize;
+      this.state.selectedToken.layer.x -= config.cellsize;
     };
 
     //Up
     up.press = () => {
-      if (!state.selectedToken) return;
-      state.selectedToken.layer.y -= config.cellsize;
+      if (!this.state.selectedToken) return;
+      this.state.selectedToken.layer.y -= config.cellsize;
     };
 
     //Right
     right.press = () => {
-      if (!state.selectedToken) return;
-      state.selectedToken.layer.x += config.cellsize;
+      if (!this.state.selectedToken) return;
+      this.state.selectedToken.layer.x += config.cellsize;
     };
 
     //Down
     down.press = () => {
-      if (!state.selectedToken) return;
-      state.selectedToken.layer.y += config.cellsize;
+      if (!this.state.selectedToken) return;
+      this.state.selectedToken.layer.y += config.cellsize;
     };
 
     this.app.ticker.add(() => {
@@ -74,6 +79,9 @@ export default class TableTop {
       // nothic.x += nothic.vx;
       // nothic.y += nothic.vy
     });
+
+    const tokens = new TokenCollection(this.state);
+    this.tokens = tokens;
 
     document.getElementById("canvas").appendChild(this.app.view);
   }
@@ -93,32 +101,41 @@ export default class TableTop {
     this.tokens.add(t);
   }
 
-  async run() {
-    const { config, assetLoader, state } = this;
-
+  async [render]() {
+    const { config } = this;
     this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
 
-    config.events.on("config:update", () => {
-      this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
+    await this.setBackgroundImage(config.backgroundImage);
+
+    if (this.grid) {
+      this.viewport.removeChild(this.grid.lines);
+    }
+    this.grid = new Grid(config, { thickness: 1 });
+    this.viewport.addChild(this.grid.lines);
+  }
+
+  async setBackgroundImage(image) {
+    if (image !== this.background.image) {
+      this.viewport.removeChild(this.background.layer);
+    }
+    if (image) {
+      if (!this.assetLoader.has(image)) {
+        this.assetLoader.add(this.config.backgroundImage);
+        await this.assetLoader.load();
+      }
+      this.background.set(image);
+      this.viewport.addChild(this.background.layer);
+    }
+  }
+
+  async run() {
+    const { config } = this;
+    await this.assetLoader.load();
+    this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
+    config.events.on("config:update", async () => {
+      await this[render]();
     });
-
-    if (config.backgroundImage) {
-      assetLoader.add("backgroundImage", config.backgroundImage);
-    }
-
-    await assetLoader.load();
-
-    if (config.backgroundImage) {
-      const background = new Background(assetLoader);
-      this.viewport.addChild(background.layer);
-    }
-
-    const grid = new Grid(config, { thickness: 1 });
-    this.viewport.addChild(grid.lines);
-
-    const tokens = new TokenCollection(state);
-    this.tokens = tokens;
-
-    this.viewport.addChild(tokens.layer);
+    await this[render]();
+    this.viewport.addChild(this.tokens.layer);
   }
 }
