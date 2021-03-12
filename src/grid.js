@@ -3,26 +3,21 @@ import { line } from "./shapes.js";
 
 export default class Grid {
   constructor(config, { thickness }) {
-    const { width, height, cellsize } = config;
+    const { widthPx, heightPx, cellsize } = config;
     this.lines = new Container();
     let x = cellsize;
-    while (x < cellsize * width) {
+    while (x < widthPx) {
       this.lines.addChild(
-        line(
-          { x, y: 0 },
-          { x, y: cellsize * width },
-          thickness,
-          config.gridTransparency
-        )
+        line({ x, y: 0 }, { x, y: widthPx }, thickness, config.gridTransparency)
       );
       x += cellsize;
     }
     let y = cellsize;
-    while (y < cellsize * height) {
+    while (y < heightPx) {
       this.lines.addChild(
         line(
           { x: 0, y },
-          { x: cellsize * height, y },
+          { x: heightPx, y },
           thickness,
           config.gridTransparency
         )

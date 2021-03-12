@@ -8,16 +8,8 @@ import htm from "htm";
 
 const html = htm.bind(h);
 
-const config = new Config({
-  name: "Test Map",
-  width: 15,
-  height: 15,
-  cellsize: 100,
-  backgroundImage: "public/bg.jpg",
-  resolution: 1,
-  backgroundColor: 0x8f8f8f,
-  gridTransparency: 1,
-});
+const config = new Config();
+config.load();
 
 const tokens = ["public/nothic.png", "public/nothic.png", "public/nothic.png"];
 
@@ -29,8 +21,10 @@ render(
   html`<${App}
     tokens="${tokens}"
     copy="${app.createTokenAtCoords.bind(app)}"
+    initialSettings="${config}"
+    updateSettings="${(settings) => config.save(settings)}"
   />`,
-  document.getElementById("sidebar")
+  document.getElementById("app")
 );
 
 app.run().catch((err) => {

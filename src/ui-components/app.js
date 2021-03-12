@@ -12,7 +12,7 @@ class App extends Component {
   }
 
   render(props, state) {
-    const { tokens, copy } = props;
+    const { tokens, copy, updateSettings, initialSettings } = props;
     const { show } = state;
     return html`
       <${SideBar}
@@ -20,7 +20,12 @@ class App extends Component {
         copy="${copy}"
         openSettings="${() => this.setState({ show: true })}"
       ><//>
-      <${Modal} show=${show}><//>
+      <${Modal}
+        initialSettings="${initialSettings}"
+        updateSettings="${updateSettings}"
+        show=${show}
+        close=${() => this.setState({ show: false })}
+      ><//>
     `;
   }
 }

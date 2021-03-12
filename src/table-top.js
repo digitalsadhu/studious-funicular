@@ -26,7 +26,7 @@ export default class TableTop {
     });
     this.app.stage.addChild(this.viewport);
 
-    this.app.renderer.backgroundColor = config.backgroundColor;
+    this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
 
     this.viewport.drag().pinch().wheel().decelerate();
 
@@ -55,12 +55,16 @@ export default class TableTop {
 
     document.getElementById("canvas").appendChild(app.view);
 
-    assets.add("backgroundImage", config.backgroundImage);
+    if (config.backgroundImage) {
+      assets.add("backgroundImage", config.backgroundImage);
+    }
     assets.add(["public/nothic.png"]);
     await assets.load();
 
-    const background = new Background(assets);
-    this.viewport.addChild(background.layer);
+    if (config.backgroundImage) {
+      const background = new Background(assets);
+      this.viewport.addChild(background.layer);
+    }
 
     const grid = new Grid(config, { thickness: 1 });
     this.viewport.addChild(grid.lines);

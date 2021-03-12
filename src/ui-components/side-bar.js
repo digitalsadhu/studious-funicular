@@ -11,9 +11,12 @@ class SideBar extends Component {
   }
 
   render({ tokens, copy, openSettings }) {
-    return html`<div id="token-container">
+    return html`<div id="sidebar">
       <${SettingsButton} open="${openSettings}"><//>
-      <${TokenList} tokens=${tokens} copy=${copy}><//>
+      <div id="token-container">
+        <${TokenList} tokens=${tokens} copy=${copy}><//>
+        <button id="new-token">+</button>
+      </div>
     </div>`;
   }
 }
