@@ -72,12 +72,7 @@ export default class TableTop {
     };
 
     this.app.ticker.add(() => {
-      // each frame we spin the active around a bit
-      //   active.rotation += 0.01;
-      //   nothic2.rotation += 0.01;
-      //   nothic3.rotation += 0.01;
-      // nothic.x += nothic.vx;
-      // nothic.y += nothic.vy
+      // animation stuff
     });
 
     const tokens = new TokenCollection(this.state);
@@ -103,15 +98,25 @@ export default class TableTop {
 
   async [render]() {
     const { config } = this;
-    this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
 
+    this.setBackgroundColor(config.backgroundColor);
     await this.setBackgroundImage(config.backgroundImage);
+    this.setGridlines(1);
+    this.setResolution(config.resolution);
+  }
 
-    if (this.grid) {
-      this.viewport.removeChild(this.grid.lines);
-    }
-    this.grid = new Grid(config, { thickness: 1 });
+  setGridlines(thickness) {
+    if (this.grid) this.viewport.removeChild(this.grid.lines);
+    this.grid = new Grid(this.config, { thickness });
     this.viewport.addChild(this.grid.lines);
+  }
+
+  setResolution(resolution) {
+    this.app.renderer.resolution = resolution;
+  }
+
+  setBackgroundColor(color) {
+    this.app.renderer.backgroundColor = parseInt(color, 16);
   }
 
   async setBackgroundImage(image) {
@@ -129,10 +134,8 @@ export default class TableTop {
   }
 
   async run() {
-    const { config } = this;
     await this.assetLoader.load();
-    this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
-    config.events.on("config:update", async () => {
+    this.config.events.on("config:update", async () => {
       await this[render]();
     });
     await this[render]();

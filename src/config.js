@@ -63,7 +63,7 @@ export default class Config {
     this.backgroundImage = backgroundImage;
     this.resolution = parseInt(resolution, 10);
     this.backgroundColor = backgroundColor;
-    this.gridTransparency = parseInt(gridTransparency, 10);
+    this.gridTransparency = parseFloat(gridTransparency, 10);
   }
 
   async load() {

@@ -85,7 +85,7 @@ class SettingsForm extends Component {
         </div>
 
         <div>
-          <p>Resolution (number between 0 - 1)</p>
+          <p>Resolution</p>
           <input
             name="resolution"
             type="number"
@@ -108,13 +108,14 @@ class SettingsForm extends Component {
           <p>Grid Transparency (from 0 - 1)</p>
           <input
             name="gridTransparency"
-            type="text"
+            type="number"
+            step="0.1"
             value=${gridTransparency}
             onInput=${this.onInput}
           />
         </div>
 
-        <button type="submit">Submit</button>
+        <button type="submit">Save</button>
       </form>
     `;
   }
