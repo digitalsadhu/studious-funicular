@@ -1,6 +1,6 @@
 export default class GameState {
-    constructor() {
-        this.selectedCell;
-        this.selectedToken;
-    }
+  constructor() {
+    this.selectedCell;
+    this.selectedToken;
+  }
 }

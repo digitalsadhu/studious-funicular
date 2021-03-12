@@ -1,21 +1,20 @@
 import { Loader } from "pixi.js";
 
 export default class GameAssets {
-    constructor() {
-        this.loader = new Loader();
-    }
+  constructor() {
+    this.loader = new Loader();
+  }
 
-    add(...args) {
-        console.log(args);
-        this.loader.add(...args);
-    }
+  add(...args) {
+    this.loader.add(...args);
+  }
 
-    load() {
-        return new Promise((resolve) => {
-            this.loader.load((_, resources) => {
-                this.resources = resources;
-                resolve();
-            })
-        });
-    }
+  load() {
+    return new Promise((resolve) => {
+      this.loader.load((_, resources) => {
+        this.resources = resources;
+        resolve();
+      });
+    });
+  }
 }
