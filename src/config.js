@@ -1,3 +1,8 @@
+import EventEmitter from "eventemitter3";
+
+const events = Symbol("events");
+const populate = Symbol("populate");
+
 export default class Config {
   constructor({
     name,
@@ -17,6 +22,7 @@ export default class Config {
     this.resolution = resolution || 1;
     this.backgroundColor = backgroundColor || 0x8f8f8f;
     this.gridTransparency = gridTransparency || 1;
+    this[events] = new EventEmitter();
   }
 
   get widthPx() {
@@ -27,14 +33,18 @@ export default class Config {
     return this.height * this.cellsize;
   }
 
-  save(settings) {
-    const store = window.localStorage;
-    store.setItem("atlas:config", JSON.stringify(settings));
+  get events() {
+    return this[events];
   }
 
-  load() {
+  async save(settings) {
     const store = window.localStorage;
-    const settings = store.getItem("atlas:config");
+    store.setItem("atlas:config", JSON.stringify(settings));
+    this[populate](settings);
+    this[events].emit("config:update");
+  }
+
+  [populate](settings) {
     if (!settings) return;
     const {
       name,
@@ -45,7 +55,7 @@ export default class Config {
       resolution,
       backgroundColor,
       gridTransparency,
-    } = JSON.parse(settings);
+    } = settings;
     this.name = name;
     this.width = parseInt(width, 10);
     this.height = parseInt(height, 10);
@@ -54,5 +64,11 @@ export default class Config {
     this.resolution = parseInt(resolution, 10);
     this.backgroundColor = backgroundColor;
     this.gridTransparency = parseInt(gridTransparency, 10);
+  }
+
+  async load() {
+    const store = window.localStorage;
+    const settings = store.getItem("atlas:config");
+    this[populate](JSON.parse(settings));
   }
 }

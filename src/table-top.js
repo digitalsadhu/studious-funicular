@@ -5,9 +5,11 @@ import Grid from "./grid.js";
 import Background from "./background.js";
 import Token from "./token.js";
 import TokenCollection from "./token-collection.js";
+import GameAssets from "./game-assets.js";
+import GameState from "./game-state.js";
 
 export default class TableTop {
-  constructor({ config, state, assets }) {
+  constructor({ config, assets }) {
     this.app = new App({
       // width: 100,         // default: 800
       // height: 100,        // default: 600
@@ -26,67 +28,13 @@ export default class TableTop {
     });
     this.app.stage.addChild(this.viewport);
 
-    this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
-
     this.viewport.drag().pinch().wheel().decelerate();
 
     this.config = config;
-    this.state = state;
-    this.assets = assets;
-  }
+    this.state = new GameState();
+    this.assetLoader = new GameAssets();
 
-  createTokenAtCoords(token) {
-    const { x, y } = this.viewport.toWorld(
-      token.x / this.config.resolution,
-      token.y / this.config.resolution
-    );
-    const cellX = Math.ceil(x / this.config.cellsize);
-    const cellY = Math.ceil(y / this.config.cellsize);
-    const t = new Token(this.config, this.assets, {
-      x: cellX,
-      y: cellY,
-      image: token.src,
-    });
-    this.tokens.add(t);
-  }
-
-  async run() {
-    const { app, config, assets, state } = this;
-
-    document.getElementById("canvas").appendChild(app.view);
-
-    if (config.backgroundImage) {
-      assets.add("backgroundImage", config.backgroundImage);
-    }
-    assets.add(["public/nothic.png"]);
-    await assets.load();
-
-    if (config.backgroundImage) {
-      const background = new Background(assets);
-      this.viewport.addChild(background.layer);
-    }
-
-    const grid = new Grid(config, { thickness: 1 });
-    this.viewport.addChild(grid.lines);
-
-    const tokens = new TokenCollection(state);
-    this.tokens = tokens;
-
-    const nothic = new Token(config, assets, {
-      x: 1,
-      y: 1,
-      image: "public/nothic.png",
-    });
-    tokens.add(nothic);
-
-    const nothic2 = new Token(config, assets, {
-      x: 9,
-      y: 9,
-      image: "public/nothic.png",
-    });
-    tokens.add(nothic2);
-
-    this.viewport.addChild(tokens.layer);
+    this.assetLoader.add(assets.tokens);
 
     const left = keyboard("ArrowLeft");
     const up = keyboard("ArrowUp");
@@ -118,7 +66,7 @@ export default class TableTop {
       state.selectedToken.layer.y += config.cellsize;
     };
 
-    app.ticker.add(() => {
+    this.app.ticker.add(() => {
       // each frame we spin the active around a bit
       //   active.rotation += 0.01;
       //   nothic2.rotation += 0.01;
@@ -126,5 +74,51 @@ export default class TableTop {
       // nothic.x += nothic.vx;
       // nothic.y += nothic.vy
     });
+
+    document.getElementById("canvas").appendChild(this.app.view);
+  }
+
+  createTokenAtCoords(token) {
+    const { x, y } = this.viewport.toWorld(
+      token.x / this.config.resolution,
+      token.y / this.config.resolution
+    );
+    const cellX = Math.ceil(x / this.config.cellsize);
+    const cellY = Math.ceil(y / this.config.cellsize);
+    const t = new Token(this.config, this.assetLoader, {
+      x: cellX,
+      y: cellY,
+      image: token.src,
+    });
+    this.tokens.add(t);
+  }
+
+  async run() {
+    const { config, assetLoader, state } = this;
+
+    this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
+
+    config.events.on("config:update", () => {
+      this.app.renderer.backgroundColor = parseInt(config.backgroundColor, 16);
+    });
+
+    if (config.backgroundImage) {
+      assetLoader.add("backgroundImage", config.backgroundImage);
+    }
+
+    await assetLoader.load();
+
+    if (config.backgroundImage) {
+      const background = new Background(assetLoader);
+      this.viewport.addChild(background.layer);
+    }
+
+    const grid = new Grid(config, { thickness: 1 });
+    this.viewport.addChild(grid.lines);
+
+    const tokens = new TokenCollection(state);
+    this.tokens = tokens;
+
+    this.viewport.addChild(tokens.layer);
   }
 }
