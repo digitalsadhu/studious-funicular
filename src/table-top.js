@@ -1,4 +1,4 @@
-import { Application as App } from "pixi.js";
+import { Application as App, Container } from "pixi.js";
 import { Viewport } from "pixi-viewport";
 import keyboard from "./keyboard.js";
 import Grid from "./grid.js";
@@ -6,12 +6,12 @@ import Background from "./background.js";
 import Token from "./token.js";
 import TokenCollection from "./token-collection.js";
 import GameAssets from "./game-assets.js";
-import GameState from "./game-state.js";
 
-const render = Symbol("render");
+const renderConfigValues = Symbol("renderConfigValues");
+const renderStateValues = Symbol("renderStateValues");
 
 export default class TableTop {
-  constructor({ config, assets }) {
+  constructor({ config, assets, state }) {
     this.app = new App({
       // width: 100,         // default: 800
       // height: 100,        // default: 600
@@ -30,17 +30,25 @@ export default class TableTop {
     });
     this.app.stage.addChild(this.viewport);
 
-    this.viewport.drag().pinch().wheel().decelerate();
-
-    this.config = config;
-
-    this.state = new GameState();
-
     this.assetLoader = new GameAssets();
     this.assetLoader.add(assets.tokens);
     this.assetLoader.add(assets.backgrounds);
 
-    this.background = new Background(this.assetLoader);
+    this.layers = {
+      background: new Background(this.assetLoader),
+      grid: new Grid(config),
+      tokens: new TokenCollection(state),
+    };
+
+    this.viewport.addChild(this.layers.background.layer);
+    this.viewport.addChild(this.layers.grid.layer);
+    this.viewport.addChild(this.layers.tokens.layer);
+
+    this.state = state;
+
+    this.viewport.drag().pinch().wheel().decelerate();
+
+    this.config = config;
 
     const left = keyboard("ArrowLeft");
     const up = keyboard("ArrowUp");
@@ -76,9 +84,6 @@ export default class TableTop {
       // animation stuff
     });
 
-    const tokens = new TokenCollection(this.state);
-    this.tokens = tokens;
-
     document.getElementById("canvas").appendChild(this.app.view);
   }
 
@@ -94,10 +99,10 @@ export default class TableTop {
       y: cellY,
       image: token.src,
     });
-    this.tokens.add(t);
+    this.layers.tokens.add(t);
   }
 
-  async [render]() {
+  async [renderConfigValues]() {
     const { config } = this;
 
     this.setBackgroundColor(config.backgroundColor);
@@ -106,10 +111,17 @@ export default class TableTop {
     this.setResolution(config.resolution);
   }
 
+  async [renderStateValues]() {
+    const { state } = this;
+    console.log("state change");
+    this.layers.tokens.removeAll();
+    for (const token of state.tokens) {
+      this.createTokenAtCoords(token);
+    }
+  }
+
   setGridlines(thickness) {
-    if (this.grid) this.viewport.removeChild(this.grid.lines);
-    this.grid = new Grid(this.config, { thickness });
-    this.viewport.addChild(this.grid.lines);
+    this.layers.grid.draw(thickness);
   }
 
   setResolution(resolution) {
@@ -121,25 +133,23 @@ export default class TableTop {
   }
 
   async setBackgroundImage(image) {
-    if (image !== this.background.image) {
-      this.viewport.removeChild(this.background.layer);
-    }
-    if (image) {
-      if (!this.assetLoader.has(image)) {
-        this.assetLoader.add(this.config.backgroundImage);
-        await this.assetLoader.load();
-      }
-      this.background.set(image);
-      this.viewport.addChild(this.background.layer);
-    }
+    this.layers.background.set(image);
   }
 
   async run() {
     await this.assetLoader.load();
+
     this.config.events.on("config:update", async () => {
-      await this[render]();
+      await this[renderConfigValues]();
     });
-    await this[render]();
-    this.viewport.addChild(this.tokens.layer);
+
+    this.state.events.on("state:update", async () => {
+      await this[renderStateValues]();
+    });
+
+    await this[renderConfigValues]();
+    await this[renderStateValues]();
+
+    this.viewport.addChild(this.layers.tokens.layer);
   }
 }

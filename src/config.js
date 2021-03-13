@@ -41,8 +41,20 @@ export default class Config {
 
   async save(settings) {
     const store = window.localStorage;
-    store.setItem("atlas:config", JSON.stringify(settings));
-    this[populate](settings);
+    const merged = {
+      name: this.name,
+      weight: this.width,
+      height: this.height,
+      cellsize: this.cellsize,
+      backgroundImage: this.backgroundImage,
+      resolution: this.resolution,
+      backgroundColor: this.backgroundColor,
+      gridTransparency: this.gridTransparency,
+      gridColor: this.gridColor,
+      ...settings,
+    };
+    store.setItem("atlas:config", JSON.stringify(merged));
+    this[populate](merged);
     this[events].emit("config:update");
   }
 

@@ -26,5 +26,7 @@ export default class TokenCollection {
     }
   }
 
-  remove(val) {}
+  removeAll() {
+    this.layer.removeChildren();
+  }
 }

@@ -76,16 +76,6 @@ class SettingsForm extends Component {
         </div>
 
         <div>
-          <p>backgroundImage URL (relative):</p>
-          <input
-            name="backgroundImage"
-            type="text"
-            value=${backgroundImage}
-            onInput=${this.onInput}
-          />
-        </div>
-
-        <div>
           <p>Resolution</p>
           <input
             name="resolution"
