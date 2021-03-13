@@ -1,7 +1,6 @@
 import { h, Component } from "preact";
 import htm from "htm";
-import TokenList from "./token-list.js";
-import SettingsButton from "./settings-button.js";
+import Token from "./token.js";
 
 const html = htm.bind(h);
 
@@ -12,9 +11,15 @@ class SideBar extends Component {
 
   render({ tokens, copy, openSettings }) {
     return html`<div id="sidebar">
-      <${SettingsButton} open="${openSettings}"><//>
+      <button id="settings-button" onClick="${() => openSettings()}">
+        Settings
+      </button>
       <div id="token-container">
-        <${TokenList} tokens=${tokens} copy=${copy}><//>
+        <ul>
+          ${tokens.map(
+            (token) => html`<${Token} src="${token}" copy="${copy}"><//>`
+          )}
+        </ul>
         <button id="new-token">+</button>
       </div>
     </div>`;
