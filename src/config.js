@@ -13,6 +13,7 @@ export default class Config {
     resolution,
     backgroundColor,
     gridTransparency,
+    gridColor,
   } = {}) {
     this.name = name || "";
     this.width = width || 10;
@@ -20,8 +21,9 @@ export default class Config {
     this.cellsize = cellsize || 50;
     this.backgroundImage = backgroundImage || null;
     this.resolution = resolution || 1;
-    this.backgroundColor = backgroundColor || 0x8f8f8f;
+    this.backgroundColor = backgroundColor || "8f8f8f";
     this.gridTransparency = gridTransparency || 1;
+    this.gridColor = gridColor || "ffffff";
     this[events] = new EventEmitter();
   }
 
@@ -55,6 +57,7 @@ export default class Config {
       resolution,
       backgroundColor,
       gridTransparency,
+      gridColor,
     } = settings;
     this.name = name;
     this.width = parseInt(width, 10);
@@ -64,6 +67,7 @@ export default class Config {
     this.resolution = parseInt(resolution, 10);
     this.backgroundColor = backgroundColor;
     this.gridTransparency = parseFloat(gridTransparency, 10);
+    this.gridColor = gridColor;
   }
 
   async load() {

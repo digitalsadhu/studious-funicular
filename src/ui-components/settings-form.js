@@ -31,6 +31,7 @@ class SettingsForm extends Component {
       resolution,
       backgroundColor,
       gridTransparency,
+      gridColor,
     } = state;
     return html`
       <form onSubmit=${this.onSubmit}>
@@ -111,6 +112,16 @@ class SettingsForm extends Component {
             type="number"
             step="0.1"
             value=${gridTransparency}
+            onInput=${this.onInput}
+          />
+        </div>
+
+        <div>
+          <p>Grid Color (hexidecimal string eg. 8f8f8f)</p>
+          <input
+            name="gridColor"
+            type="string"
+            value=${gridColor}
             onInput=${this.onInput}
           />
         </div>

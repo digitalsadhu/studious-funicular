@@ -8,7 +8,13 @@ export default class Grid {
     let x = cellsize;
     while (x < widthPx) {
       this.lines.addChild(
-        line({ x, y: 0 }, { x, y: widthPx }, thickness, config.gridTransparency)
+        line(
+          { x, y: 0 },
+          { x, y: widthPx },
+          thickness,
+          config.gridTransparency,
+          parseInt(config.gridColor, 16)
+        )
       );
       x += cellsize;
     }
@@ -19,7 +25,8 @@ export default class Grid {
           { x: 0, y },
           { x: heightPx, y },
           thickness,
-          config.gridTransparency
+          config.gridTransparency,
+          parseInt(config.gridColor, 16)
         )
       );
       y += cellsize;
