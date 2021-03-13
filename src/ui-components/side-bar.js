@@ -9,15 +9,18 @@ class SideBar extends Component {
     super();
   }
 
-  render({ tokens, copy, openSettings }) {
+  render({ tokens, dropToken, openSettings, openBackgrounds }) {
     return html`<div id="sidebar">
       <button id="settings-button" onClick="${() => openSettings()}">
         Settings
       </button>
+      <button id="backgrounds-button" onClick="${() => openBackgrounds()}">
+        Backgrounds
+      </button>
       <div id="token-container">
         <ul>
           ${tokens.map(
-            (token) => html`<${Token} src="${token}" copy="${copy}"><//>`
+            (token) => html`<${Token} src="${token}" copy="${dropToken}"><//>`
           )}
         </ul>
         <button id="new-token">+</button>

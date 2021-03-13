@@ -20,7 +20,9 @@ const main = async () => {
   render(
     html`<${App}
       tokens="${assets.tokens}"
-      copy="${app.createTokenAtCoords.bind(app)}"
+      dropToken="${app.createTokenAtCoords.bind(app)}"
+      backgrounds="${assets.backgrounds}"
+      pickBackground="${app.setBackgroundImage.bind(app)}"
       initialSettings="${config}"
       updateSettings="${(settings) => config.save(settings)}"
     />`,

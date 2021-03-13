@@ -38,6 +38,7 @@ export default class TableTop {
 
     this.assetLoader = new GameAssets();
     this.assetLoader.add(assets.tokens);
+    this.assetLoader.add(assets.backgrounds);
 
     this.background = new Background(this.assetLoader);
 

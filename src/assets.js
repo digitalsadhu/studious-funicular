@@ -4,6 +4,13 @@ export default class Assets {
   }
 
   async load() {
+    this.backgrounds = [
+      "public/backgrounds/grass-grid.jpg",
+      "public/backgrounds/sand-grid.jpg",
+      "public/backgrounds/stone-grid.jpg",
+      "public/backgrounds/water-grid.jpg",
+      "public/backgrounds/wood-grid.jpg",
+    ];
     this.tokens = [
       "public/token_144.png",
       "public/token_150.png",
