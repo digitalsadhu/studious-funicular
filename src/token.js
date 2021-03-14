@@ -1,38 +1,46 @@
 import { Sprite, Container, filters } from "pixi.js";
 
+const _settings = Symbol("settings");
+const _colorFilter = Symbol("colorFilter");
+const _layer = Symbol("layer");
+
 export default class Token {
-  constructor(config, assets, { x, y, image }) {
+  constructor(settings, assets, { x, y, src }) {
     const {
       loader: { resources },
     } = assets;
-    const xy = (i) => i * config.cellsize - config.cellsize;
+    const xy = (i) => i * settings.cellsize - settings.cellsize;
 
-    this.config = config;
-    const layer = new Container();
-    this.layer = layer;
-    layer.interactive = true;
+    this.x = x;
+    this.y = y;
+    this.src = src;
 
-    this.colorFilter = new filters.ColorMatrixFilter();
-    layer.filters = [this.colorFilter];
-    this.colorFilter.enabled = false;
-    this.colorFilter.hue(45);
+    this[_settings] = settings;
+    this[_layer] = new Container();
+    this[_layer].interactive = true;
 
-    const sprite = new Sprite(resources[image].texture);
-    sprite.width = config.cellsize;
-    sprite.height = config.cellsize;
+    this[_colorFilter] = new filters.ColorMatrixFilter();
+    this[_layer].filters = [this[_colorFilter]];
+    this[_colorFilter].enabled = false;
+    this[_colorFilter].hue(45);
+
+    console.log(src, resources[src]);
+    const sprite = new Sprite(resources[src].texture);
+    sprite.width = settings.cellsize;
+    sprite.height = settings.cellsize;
     sprite.anchor.x = 0.5;
     sprite.anchor.y = 0.5;
 
-    layer.x = config.cellsize / 2 + xy(x);
-    layer.y = config.cellsize / 2 + xy(y);
+    this[_layer].x = settings.cellsize / 2 + xy(x);
+    this[_layer].y = settings.cellsize / 2 + xy(y);
 
     this.setupDragAndDrop();
 
-    layer.addChild(sprite);
+    this[_layer].addChild(sprite);
   }
 
   setupDragAndDrop() {
-    const config = this.config;
+    const settings = this[_settings];
     let drag = false;
     this.layer.on("mousedown", () => {
       drag = true;
@@ -42,9 +50,9 @@ export default class Token {
       const pos = e.data.getLocalPosition(this.layer.parent);
       // snap
       const closestCellX =
-        pos.x - (pos.x % this.config.cellsize) + config.cellsize / 2;
+        pos.x - (pos.x % settings.cellsize) + settings.cellsize / 2;
       const closestCellY =
-        pos.y - (pos.y % this.config.cellsize) + config.cellsize / 2;
+        pos.y - (pos.y % settings.cellsize) + settings.cellsize / 2;
       this.layer.position.x = closestCellX;
       this.layer.position.y = closestCellY;
       drag = false;
@@ -58,11 +66,23 @@ export default class Token {
     });
   }
 
+  get layer() {
+    return this[_layer];
+  }
+
   select() {
-    this.colorFilter.enabled = true;
+    this[_colorFilter].enabled = true;
   }
 
   unselect() {
-    this.colorFilter.enabled = false;
+    this[_colorFilter].enabled = false;
+  }
+
+  toJSON() {
+    return {
+      x: this.x,
+      y: this.y,
+      src: this.src,
+    };
   }
 }

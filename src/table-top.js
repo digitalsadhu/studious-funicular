@@ -1,22 +1,19 @@
-import { Application as App, Container } from "pixi.js";
+import { Application as App } from "pixi.js";
 import { Viewport } from "pixi-viewport";
-import keyboard from "./keyboard.js";
+// import keyboard from "./keyboard.js";
 import Grid from "./grid.js";
 import Background from "./background.js";
 import Token from "./token.js";
 import TokenCollection from "./token-collection.js";
 import GameAssets from "./game-assets.js";
 
-const renderConfigValues = Symbol("renderConfigValues");
-const renderStateValues = Symbol("renderStateValues");
-
 export default class TableTop {
-  constructor({ config, assets, state }) {
+  constructor({ assets, state }) {
     this.app = new App({
       // width: 100,         // default: 800
       // height: 100,        // default: 600
       antialias: true,
-      resolution: config.resolution,
+      resolution: state.settings.resolution,
       resizeTo: window,
       // powerPreference: 'high-performance',
     });
@@ -29,15 +26,16 @@ export default class TableTop {
       interaction: this.app.renderer.plugins.interaction, // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
     });
     this.app.stage.addChild(this.viewport);
-
     this.assetLoader = new GameAssets();
     this.assetLoader.add(assets.tokens);
     this.assetLoader.add(assets.backgrounds);
 
+    this.selectedToken = null;
+
     this.layers = {
       background: new Background(this.assetLoader),
-      grid: new Grid(config),
-      tokens: new TokenCollection(state),
+      grid: new Grid(),
+      tokens: new TokenCollection(this),
     };
 
     this.viewport.addChild(this.layers.background.layer);
@@ -48,80 +46,59 @@ export default class TableTop {
 
     this.viewport.drag().pinch().wheel().decelerate();
 
-    this.config = config;
+    // const left = keyboard("ArrowLeft");
+    // const up = keyboard("ArrowUp");
+    // const right = keyboard("ArrowRight");
+    // const down = keyboard("ArrowDown");
 
-    const left = keyboard("ArrowLeft");
-    const up = keyboard("ArrowUp");
-    const right = keyboard("ArrowRight");
-    const down = keyboard("ArrowDown");
+    // //Left arrow key `press` method
+    // left.press = () => {
+    //   if (!this.selectedToken) return;
+    //   //Change the cat's velocity when the key is pressed
+    //   this.selectedToken.layer.x -= state.settings.cellsize;
+    // };
 
-    //Left arrow key `press` method
-    left.press = () => {
-      if (!this.state.selectedToken) return;
-      //Change the cat's velocity when the key is pressed
-      this.state.selectedToken.layer.x -= config.cellsize;
-    };
+    // //Up
+    // up.press = () => {
+    //   if (!this.selectedToken) return;
+    //   this.selectedToken.layer.y -= state.settings.cellsize;
+    // };
 
-    //Up
-    up.press = () => {
-      if (!this.state.selectedToken) return;
-      this.state.selectedToken.layer.y -= config.cellsize;
-    };
+    // //Right
+    // right.press = () => {
+    //   if (!this.selectedToken) return;
+    //   this.selectedToken.layer.x += state.settings.cellsize;
+    // };
 
-    //Right
-    right.press = () => {
-      if (!this.state.selectedToken) return;
-      this.state.selectedToken.layer.x += config.cellsize;
-    };
+    // //Down
+    // down.press = () => {
+    //   if (!this.selectedToken) return;
+    //   this.selectedToken.layer.y += state.settings.cellsize;
+    // };
 
-    //Down
-    down.press = () => {
-      if (!this.state.selectedToken) return;
-      this.state.selectedToken.layer.y += config.cellsize;
-    };
-
-    this.app.ticker.add(() => {
-      // animation stuff
-    });
+    // this.app.ticker.add(() => {
+    //   // animation stuff
+    // });
 
     document.getElementById("canvas").appendChild(this.app.view);
   }
 
-  createTokenAtCoords(token) {
+  createTokenAtCoords(tokenData) {
     const { x, y } = this.viewport.toWorld(
-      token.x / this.config.resolution,
-      token.y / this.config.resolution
+      tokenData.x / this.state.settings.resolution,
+      tokenData.y / this.state.settings.resolution
     );
-    const cellX = Math.ceil(x / this.config.cellsize);
-    const cellY = Math.ceil(y / this.config.cellsize);
-    const t = new Token(this.config, this.assetLoader, {
+    const cellX = Math.ceil(x / this.state.settings.cellsize);
+    const cellY = Math.ceil(y / this.state.settings.cellsize);
+    this.state.tokens.add({
       x: cellX,
       y: cellY,
-      image: token.src,
+      src: tokenData.src,
     });
-    this.layers.tokens.add(t);
   }
 
-  async [renderConfigValues]() {
-    const { config } = this;
-
-    this.setBackgroundColor(config.backgroundColor);
-    await this.setBackgroundImage(config.backgroundImage);
-    this.setGridlines(1);
-    this.setResolution(config.resolution);
-  }
-
-  async [renderStateValues]() {
-    const { state } = this;
-    console.log("state change");
-    this.layers.tokens.removeAll();
-    for (const token of state.tokens) {
-      this.createTokenAtCoords(token);
-    }
-  }
-
-  setGridlines(thickness) {
-    this.layers.grid.draw(thickness);
+  setGridlines(settings) {
+    this.layers.grid.draw(settings);
   }
 
   setResolution(resolution) {
@@ -139,16 +116,21 @@ export default class TableTop {
   async run() {
     await this.assetLoader.load();
 
-    this.config.events.on("config:update", async () => {
-      await this[renderConfigValues]();
+    this.state.on("state:background:update", (background) => {
+      this.setBackgroundImage(background.src);
     });
 
-    this.state.events.on("state:update", async () => {
-      await this[renderStateValues]();
+    this.state.on("state:settings:update", (settings) => {
+      this.setBackgroundColor(settings.backgroundColor);
+      this.setResolution(settings.resolution);
+      this.setGridlines(settings);
     });
 
-    await this[renderConfigValues]();
-    await this[renderStateValues]();
+    this.state.on("state:tokens:add", (token) => {
+      this.layers.tokens.add(
+        new Token(this.state.settings, this.assetLoader, token)
+      );
+    });
 
     this.viewport.addChild(this.layers.tokens.layer);
   }

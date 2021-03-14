@@ -1,6 +1,7 @@
 export default class Assets {
   constructor() {
     this.tokens = [];
+    this.backgrounds = [];
   }
 
   async load() {

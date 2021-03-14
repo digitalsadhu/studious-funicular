@@ -8,43 +8,60 @@ import BackgroundsForm from "./backgrounds-form.js";
 const html = htm.bind(h);
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = { show: false, backgrounds: false, settings: false };
+  constructor(props) {
+    super(props);
+    this.state = {
+      show: false,
+      showBackgrounds: false,
+      settings: props.worldState.settings,
+      showSettings: false,
+    };
+  }
+
+  componentDidMount() {
+    this.props.worldState.on("state:settings:update", (settings) => {
+      this.setState({ settings });
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.worldState.off("state:settings:update");
   }
 
   render(props, state) {
-    const {
-      tokens,
-      dropToken,
-      updateSettings,
-      initialSettings,
-      backgrounds,
-      pickBackground,
-    } = props;
+    const { dropToken } = props;
     return html`
       <${SideBar}
-        tokens="${tokens}"
+        tokens="${props.assets.tokens}"
         dropToken="${dropToken}"
         openSettings="${() =>
-          this.setState({ show: true, backgrounds: false, settings: true })}"
+          this.setState({
+            show: true,
+            showBackgrounds: false,
+            showSettings: true,
+          })}"
         openBackgrounds="${() =>
-          this.setState({ show: true, backgrounds: true, settings: false })}"
+          this.setState({
+            show: true,
+            showBackgrounds: true,
+            showSettings: false,
+          })}"
       ><//>
       <${Modal}
         show=${state.show}
         close=${() => this.setState({ show: false })}
       >
-        ${state.settings
+        ${state.showSettings
           ? html`<${SettingsForm}
-              submit="${updateSettings}"
-              initialSettings="${initialSettings}"
+              submit="${(settings) => (props.worldState.settings = settings)}"
+              initialSettings="${state.settings}"
             ><//>`
           : html``}
-        ${state.backgrounds
+        ${state.showBackgrounds
           ? html`<${BackgroundsForm}
-              select="${pickBackground}"
-              backgrounds="${backgrounds}"
+              select="${(background) =>
+                (props.worldState.background = { src: background })}"
+              backgrounds="${props.assets.backgrounds}"
             ><//>`
           : html``}
       <//>
