@@ -9,7 +9,6 @@ export default class Tokens extends Map {
   }
 
   add(token) {
-    console.log(token);
     this.set(token.src, token);
     this[_events].emit("state:tokens:add", token);
     this[_adapter].set("state:tokens", Array.from(this.entries()));

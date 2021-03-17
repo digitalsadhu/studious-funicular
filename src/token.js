@@ -24,7 +24,6 @@ export default class Token {
     this[_colorFilter].enabled = false;
     this[_colorFilter].hue(45);
 
-    console.log(src, resources[src]);
     const sprite = new Sprite(resources[src].texture);
     sprite.width = settings.cellsize;
     sprite.height = settings.cellsize;

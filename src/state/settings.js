@@ -11,11 +11,11 @@ export default class Settings {
   }
 
   get widthPx() {
-    return this.width * this.cellsize;
+    return parseInt(this.width * this.cellsize, 10);
   }
 
   get heightPx() {
-    return this.height * this.cellsize;
+    return parseInt(this.height * this.cellsize, 10);
   }
 
   set({
@@ -28,7 +28,7 @@ export default class Settings {
     gridTransparency,
     gridColor,
   } = {}) {
-    const changes = false;
+    let changes = false;
 
     if (name && name !== this.name) {
       this.name = name;
@@ -36,22 +36,22 @@ export default class Settings {
     }
 
     if (width && width !== this.width) {
-      this.width = width;
+      this.width = parseInt(width, 10);
       changes = true;
     }
 
     if (height && height !== this.height) {
-      this.height = height;
+      this.height = parseInt(height, 10);
       changes = true;
     }
 
     if (cellsize && cellsize !== this.cellsize) {
-      this.cellsize = cellsize;
+      this.cellsize = parseInt(cellsize, 10);
       changes = true;
     }
 
     if (resolution && resolution !== this.resolution) {
-      this.resolution = resolution;
+      this.resolution = parseInt(resolution, 10);
       changes = true;
     }
 
@@ -61,7 +61,7 @@ export default class Settings {
     }
 
     if (gridTransparency && gridTransparency !== this.gridTransparency) {
-      this.gridTransparency = gridTransparency;
+      this.gridTransparency = parseFloat(gridTransparency);
       changes = true;
     }
 

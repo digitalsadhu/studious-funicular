@@ -7,7 +7,8 @@ export default class Grid {
   }
 
   draw(settings) {
-    const { cellsize, gridTransparency } = settings;
+    console.log(settings);
+    const { cellsize, gridTransparency, gridColor } = settings;
     const thickness = 1;
     let x = cellsize;
     this.layer.removeChildren();

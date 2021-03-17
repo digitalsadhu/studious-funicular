@@ -27,7 +27,6 @@ class SettingsForm extends Component {
       width,
       height,
       cellsize,
-      backgroundImage,
       resolution,
       backgroundColor,
       gridTransparency,
